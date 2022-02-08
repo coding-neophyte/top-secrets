@@ -20,11 +20,23 @@ describe('backend routes', () => {
     };
     const res = await request(app).post('/api/v1/users').send(newUser);
 
-    console.log(res.body);
-
     expect(res.body).toEqual({
       id: expect.any(String),
       email: 'any@mail.com',
     });
+  });
+  it('should log in a existing user', async () => {
+    const mockUser = {
+      email: 'any@mail.com',
+      password: 'allgood'
+    };
+
+    const newUser = await UserService.createUser(mockUser);
+
+    // const existingUser = await UserService.signin(mockUser);
+
+    const res = await request(app).post('/api/v1/users/sessions').send(mockUser);
+
+    expect(res.body).toEqual({ message: 'Sign in successful' });
   });
 });
