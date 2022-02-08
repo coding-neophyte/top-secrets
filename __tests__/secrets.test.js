@@ -2,7 +2,6 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
-const Secret = require('../lib/models/Secret');
 const UserServices = require('../lib/services/UserServices');
 
 const agent = request.agent(app);
@@ -35,5 +34,29 @@ describe('testing secret routes', () => {
       description: 'aliens do exist',
       created_at: expect.any(String),
     });
+  });
+
+  it('should allow logged in user access to secrets', async () => {
+    const mockUser = {
+      email: 'any@mail.com',
+      password: 'allgood'
+    };
+
+    await UserServices.createUser(mockUser);
+
+    await agent.post('/api/v1/users/sessions').send(mockUser);
+    await agent.post('/api/v1/secrets').send({
+      title: 'aliens',
+      description: 'aliens do exist',
+    });
+
+    const res = await agent.get('/api/v1/secrets');
+
+    expect(res.body).toEqual(expect.arrayContaining([{
+      id: expect.any(String),
+      title: 'aliens',
+      description: 'aliens do exist',
+      created_at: expect.any(String),
+    }]));
   });
 });
