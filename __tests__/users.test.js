@@ -39,4 +39,16 @@ describe('backend routes', () => {
 
     expect(res.body).toEqual({ message: 'Sign in successful' });
   });
+
+  it('should logout a user', async () => {
+    const mockUser = {
+      email: 'any@email.com',
+      password: 'allgood',
+    };
+    const res =  await request(app).delete('/api/v1/users/sessions').send(mockUser);
+
+    expect(res.body).toEqual({
+      message: 'logout successful',
+    });
+  });
 });
